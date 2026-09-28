@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Prime &bull; Institutional Liquidity Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: #0a0e1a;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(30, 41, 59, 0.8);
+        }
+
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .security-bar {
+            background: linear-gradient(90deg, #06b6d4, #10b981);
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(6, 182, 212, 0.1), 0 10px 10px -5px rgba(6, 182, 212, 0.04);
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header Profissional -->
+    <header class="w-full border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500 to-emerald-400 flex items-center justify-center font-black text-slate-950 text-xl shadow-lg shadow-cyan-500/30">
+                            Ω
+                        </div>
+                        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-950 pulse-dot"></div>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-xl tracking-tight text-white">NEXUS<span class="text-cyan-400">PRIME</span></span>
+                            <span class="text-[9px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded-full font-semibold tracking-wider">PRO</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500 tracking-wider uppercase mt-0.5">Institutional Custody Platform</div>
+                    </div>
+                </div>
+                
+                <nav class="hidden lg:flex items-center gap-8 text-sm">
+                    <a href="#" class="text-slate-400 hover:text-white transition font-medium">Dashboard</a>
+                    <a href="#" class="text-slate-400 hover:text-white transition font-medium">Portfolio</a>
+                    <a href="#" class="text-slate-400 hover:text-white transition font-medium">Transações</a>
+                    <a href="#" class="text-slate-400 hover:text-white transition font-medium">Compliance</a>
+                    <a href="#" class="text-slate-400 hover:text-white transition font-medium">Suporte</a>
+                </nav>
+
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex items-center gap-2 bg-slate-900/80 border border-slate-800 px-3 py-1.5 rounded-lg text-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+                        <span class="text-slate-400 font-medium">US-EAST-SECURE</span>
+                    </div>
+                    <button onclick="iniciarEscaneamentoBiometrico()" class="bg-gradient-to-r from-cyan-500 to-emerald-400 hover:from-cyan-400 hover:to-emerald-300 text-slate-950 font-bold px-5 py-2 rounded-lg text-sm transition shadow-lg shadow-cyan-500/20 cursor-pointer flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        Executar Saque
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-8">
+        
+        <!-- Status Banner -->
+        <div class="mb-8 flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-semibold">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    Conta Verificada
+                </div>
+                <div class="flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs px-3 py-1.5 rounded-lg font-semibold">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                    </svg>
+                    Nível Baleia Institucional
+                </div>
+            </div>
+            <div class="text-xs text-slate-500">
+                Última atualização: <span class="text-slate-300 font-medium" id="last-update">Agora</span>
+            </div>
+        </div>
+
+        <!-- Portfolio Overview -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Main Balance Card -->
+            <div class="lg:col-span-2 glass-card rounded-2xl p-8 hover-lift">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <p class="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-2">Saldo Total em Custódia</p>
+                        <div class="flex items-baseline gap-3">
+                            <h1 class="text-5xl md:text-6xl font-black tracking-tight text-white">
+                                300.00
+                            </h1>
+                            <span class="text-2xl font-bold text-cyan-400">BTC</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-lg text-sm font-semibold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                        +12.4%
+                    </div>
+                </div>
+
+                <!-- Valor em Moeda Fiat -->
+                <div class="bg-slate-900/40 rounded-xl p-5 mb-6 border border-slate-800/60">
+                    <p class="text-slate-500 text-xs uppercase tracking-wider font-semibold mb-2">Valor Líquido de Mercado</p>
+                    <div id="usd-value" class="text-3xl font-bold text-emerald-400 mb-1">Sincronizando feed de preços...</div>
+                    <div id="brl-value" class="text-sm text-slate-400 font-medium"></div>
+                </div>
+
+                <!-- Chart -->
+                <div class="relative h-48">
+                    <canvas id="portfolioChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Security Metrics -->
+            <div class="glass-card rounded-2xl p-6 hover-lift">
+                <div class="flex items-center gap-2 mb-6">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <h3 class="font-bold text-white">Métricas de Segurança</h3>
+                </div>
+
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-slate-400">Cold Storage</span>
+                            <span class="text-emerald-400 font-semibold">100%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-1.5">
+                            <div class="security-bar" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-slate-400">Multi-Sig Ativo</span>
+                            <span class="text-emerald-400 font-semibold">3/5</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-1.5">
+                            <div class="security-bar" style="width: 60%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-slate-400">2FA Hardware</span>
+                            <span class="text-emerald-400 font-semibold">Ativado</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-1.5">
+                            <div class="security-bar" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-800">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-400">Score de Segurança</span>
+                            <span class="text-2xl font-black text-emerald-400">A+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="glass-card rounded-xl p-5 hover-lift">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-slate-400 text-xs uppercase tracking-wider font-semibold">Volume 24h</span>
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-white mb-1">$2.4M</div>
+                <div class="text-xs text-emerald-400 font-semibold">+8.2% vs ontem</div>
+            </div>
+
+            <div class="glass-card rounded-xl p-5 hover-lift">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-slate-400 text-xs uppercase tracking-wider font-semibold">Transações</span>
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-white mb-1">1,247</div>
+                <div class="text-xs text-emerald-400 font-semibold">+156 hoje</div>
+            </div>
+
+            <div class="glass-card rounded-xl p-5 hover-lift">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-slate-400 text-xs uppercase tracking-wider font-semibold">Nós Ativos</span>
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-white mb-1">42</div>
+                <div class="text-xs text-slate-400 font-semibold">Global distribution</div>
+            </div>
+
+            <div class="glass-card rounded-xl p-5 hover-lift">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-slate-400 text-xs uppercase tracking-wider font-semibold">Uptime</span>
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-white mb-1">99.99%</div>
+                <div class="text-xs text-emerald-400 font-semibold">SLA garantido</div>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="glass-card rounded-2xl p-6 hover-lift">
+                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <h3 class="font-bold text-lg mb-2 text-white">Segurança Cold Storage</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                    Ativos isolados em múltiplos nós criptográficos offline com redundância geográfica e backup distribuído.
+                </p>
+                <div class="flex items-center gap-2 text-xs text-cyan-400 font-semibold">
+                    <span>Saiba mais</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 hover-lift">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <h3 class="font-bold text-lg mb-2 text-white">Liquidez Instantânea</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                    Pontes diretas com formadores de mercado globais e mesas OTC para execução em milissegundos.
+                </p>
+                <div class="flex items-center gap-2 text-xs text-emerald-400 font-semibold">
+                    <span>Saiba mais</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 hover-lift">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <h3 class="font-bold text-lg mb-2 text-white">Compliance Bancário</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                    Em conformidade com protocolos internacionais de auditoria, AML/KYT e regulamentações SOC 2.
+                </p>
+                <div class="flex items-center gap-2 text-xs text-purple-400 font-semibold">
+                    <span>Saiba mais</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="glass-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-bold text-lg text-white">Transações Recentes</h3>
+                <button class="text-sm text-cyan-400 hover:text-cyan-300 font-semibold transition">Ver todas</button>
+            </div>
+            
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-4 bg-slate-900/40 rounded-xl hover:bg-slate-900/60 transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white text-sm">Depósito Recebido</div>
+                            <div class="text-xs text-slate-500">2 horas atrás</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-emerald-400">+2.5 BTC</div>
+                        <div class="text-xs text-slate-500">Confirmado</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-slate-900/40 rounded-xl hover:bg-slate-900/60 transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white text-sm">Swap BTC → USDT</div>
+                            <div class="text-xs text-slate-500">5 horas atrás</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-cyan-400">150,000 USDT</div>
+                        <div class="text-xs text-slate-500">Executado</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-slate-900/40 rounded-xl hover:bg-slate-900/60 transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white text-sm">Staking Rewards</div>
+                            <div class="text-xs text-slate-500">1 dia atrás</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-purple-400">+0.085 BTC</div>
+                        <div class="text-xs text-slate-500">Distribuído</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal 1: Escaneamento Facial e Biometria -->
+    <div id="modal-biometria" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-cyan-500/30 rounded-2xl max-w-md w-full shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-emerald-400"></div>
+            
+            <div class="p-8">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Verificação Biométrica Obrigatória</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Aponte o rosto para a câmera para validação de identidade antifraude exigida pelo Banco Central.
+                    </p>
+                </div>
+                
+                <!-- Espaço da Câmera / Radar -->
+                <div class="relative w-56 h-56 mx-auto mb-6 rounded-2xl overflow-hidden bg-slate-950 border-2 border-cyan-500/60 shadow-inner flex items-center justify-center">
+                    <video id="webcam" autoplay playsinline class="w-full h-full object-cover transform -scale-x-100"></video>
+                    <!-- Grade de escaneamento futurista -->
+                    <div class="absolute inset-0 bg-[linear-gradient(to_right,#06b6d410_1px,transparent_1px),linear-gradient(to_bottom,#06b6d410_1px,transparent_1px)] bg-[size:1rem_1rem]"></div>
+                    <div class="absolute w-full h-1 bg-cyan-400/80 shadow-[0_0_10px_#06b6d4] animate-bounce top-1/2"></div>
+                    <div id="status-camera" class="absolute bottom-2 text-[10px] text-cyan-300 bg-slate-900/80 px-2 py-0.5 rounded font-mono">Iniciando sensor...</div>
+                </div>
+
+                <div id="bio-status-text" class="text-xs text-slate-300 font-mono mb-6 text-center bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                    Aguardando permissão da câmera...
+                </div>
+                
+                <button onclick="prosseguirParaTerror()" class="w-full bg-gradient-to-r from-cyan-500 to-emerald-400 hover:from-cyan-400 hover:to-emerald-300 text-slate-950 font-bold py-3.5 rounded-xl text-sm transition cursor-pointer shadow-lg shadow-cyan-500/20">
+                    Confirmar Biometria Facial
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Terror Psicológico Final -->
+    <div id="modal-terror" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-red-500/30 rounded-2xl max-w-2xl w-full shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500 animate-pulse"></div>
+            
+            <div class="p-8">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-white mb-2">Biometria Registrada &bull; Alerta de Compliance</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">
+                            Sua face e IP foram salvos na base da Receita Federal. Identificamos uma tentativa de transferência integral sem a quitação prévia da taxa de liquidação obrigatória.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-5 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-slate-400 text-sm">Valor da Transferência</span>
+                        <span class="text-white font-bold">300.00 BTC</span>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-slate-400 text-sm">Taxa de Liquidação</span>
+                        <span class="text-red-400 font-bold">0.085 BTC</span>
+                    </div>
+                    <div class="border-t border-slate-800 pt-4 flex items-center justify-between">
+                        <span class="text-slate-300 text-sm font-semibold">Total Necessário</span>
+                        <span class="text-red-400 font-bold text-lg">0.085 BTC</span>
+                    </div>
+                </div>
+
+                <div class="bg-red-500/5 border border-red-500/20 rounded-xl p-4 mb-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                        <span class="text-red-400 font-semibold text-xs uppercase tracking-wider">Aviso de Auto-Execução</span>
+                    </div>
+                    <p class="text-slate-400 text-xs leading-relaxed mb-3">
+                        Ao prosseguir, um Smart Contract irrevogável será acionado, autorizando o débito automático de taxas em todas as contas vinculadas à biometria facial capturada.
+                    </p>
+                    <div class="text-center">
+                        <div class="text-red-400 font-mono font-bold text-lg" id="timer">
+                            Tempo limite: 00:10
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 relative">
+                    <button onclick="caiuNaZueira()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl text-sm transition cursor-pointer shadow-lg shadow-red-500/20">
+                        Autorizar Pagamento
+                    </button>
+                    
+                    <button id="btn-foge" onmouseover="fugirBotao()" onclick="caiuNaZueira()" class="w-40 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-sm transition cursor-pointer" style="transition: transform 0.2s ease-out;">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-slate-800/60 bg-slate-950/80 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-emerald-400 flex items-center justify-center font-black text-slate-950 text-sm">
+                            Ω
+                        </div>
+                        <span class="font-bold text-white">NEXUS<span class="text-cyan-400">PRIME</span></span>
+                    </div>
+                    <p class="text-slate-500 text-xs leading-relaxed">
+                        Plataforma institucional de custódia de ativos digitais com segurança de nível bancário.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-white text-sm mb-3">Produto</h4>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li><a href="#" class="hover:text-slate-300 transition">Custódia</a></li>
+                        <li><a href="#" class="hover:text-slate-300 transition">Trading</a></li>
+                        <li><a href="#" class="hover:text-slate-300 transition">Staking</a></li>
+                        <li><a href="#" class="hover:text-slate-300 transition">API</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-white text-sm mb-3">Empresa</h4>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li><a href="#" class="hover:text-slate-300 transition">Sobre</a></li>
+                        <li><a href="#" class="hover:text-slate-300 transition">Carreiras</a></li>
+                        <li><a href="#" class="hover:text-slate-300 transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-slate-300 transition">Contato</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-white text-sm mb-3">Legal</h4>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li><a href="#" class="hover:text-slate-300 transition">Termos</a></li>
+                        <li><a href="#" class="hover:text-slate-300 transition">Privacidade</a></li>
+                        <li><a href="#" class="hover:text-slate-300 transition">Compliance</a></li>
+                        <li><a href="#" class="hover:text-slate-300 transition">Segurança</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="text-xs text-slate-600">
+                    © 2026 Nexus Prime Custody Solutions. Todos os direitos reservados.
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 text-xs text-slate-600">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+                        Todos os sistemas operacionais
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Chart.js Configuration
+        const ctx = document.getElementById('portfolioChart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(6, 182, 212, 0.3)');
+        gradient.addColorStop(1, 'rgba(6, 182, 212, 0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set'],
+                datasets: [{
+                    label: 'Portfolio Value',
+                    data: [245, 258, 262, 271, 268, 275, 282, 289, 300],
+                    borderColor: '#06b6d4',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#06b6d4',
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#06b6d4',
+                        borderColor: 'rgba(6, 182, 212, 0.3)',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' BTC';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(30, 41, 59, 0.5)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                size: 11
+                            },
+                            callback: function(value) {
+                                return value + ' BTC';
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+
+        // Fetch Bitcoin Price
+        async function fetchBitcoinPrice() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,brl');
+                const data = await response.json();
+                
+                const btcUsd = data.bitcoin.usd * 300;
+                const btcBrl = data.bitcoin.brl * 300;
+
+                document.getElementById('usd-value').innerText = btcUsd.toLocaleString('en-US', { 
+                    style: 'currency', 
+                    currency: 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+                document.getElementById('brl-value').innerText = '≈ ' + btcBrl.toLocaleString('pt-BR', { 
+                    style: 'currency', 
+                    currency: 'BRL',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+
+                const now = new Date();
+                document.getElementById('last-update').innerText = now.toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            } catch (error) {
+                document.getElementById('usd-value').innerText = "$28,500,000 (Estimado)";
+                document.getElementById('brl-value').innerText = "≈ R$ 142,500,000";
+            }
+        }
+
+        fetchBitcoinPrice();
+        setInterval(fetchBitcoinPrice, 60000);
+
+        let streamGlobal = null;
+        let timerInterval;
+
+        // Passo 1: Abre a modal de biometria e tenta ligar a webcam real
+        async function iniciarEscaneamentoBiometrico() {
+            document.getElementById('modal-biometria').classList.remove('hidden');
+            document.getElementById('modal-biometria').classList.add('flex');
+            const videoElement = document.getElementById('webcam');
+            const statusText = document.getElementById('status-camera');
+
+            try {
+                streamGlobal = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = streamGlobal;
+                statusText.innerText = "Face mapeada com sucesso!";
+                document.getElementById('bio-status-text').innerText = "✓ Biometria facial validada via Liveness Check.";
+            } catch (err) {
+                statusText.innerText = "Câmera indisponível";
+                document.getElementById('bio-status-text').innerText = "⚠ Aviso: Câmera não encontrada. Usando IP e ID do dispositivo para rastreio.";
+            }
+        }
+
+        // Passo 2: Fecha a biometria e abre o terror psicológico com o cronômetro
+        function prosseguirParaTerror() {
+            // Desliga a câmera para não ficar consumindo o hardware
+            if (streamGlobal) {
+                streamGlobal.getTracks().forEach(track => track.stop());
+            }
+
+            document.getElementById('modal-biometria').classList.add('hidden');
+            document.getElementById('modal-biometria').classList.remove('flex');
+            document.getElementById('modal-terror').classList.remove('hidden');
+            document.getElementById('modal-terror').classList.add('flex');
+            iniciarContador();
+        }
+
+        function iniciarContador() {
+            let segundos = 10;
+            const timerEl = document.getElementById('timer');
+            clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                segundos--;
+                if (segundos < 10) segundos = "0" + segundos;
+                timerEl.innerText = `Tempo limite: 00:${segundos}`;
+                
+                if (segundos <= 0) {
+                    clearInterval(timerInterval);
+                    timerEl.innerText = "CONTA BLOQUEADA!";
+                    timerEl.classList.add('text-red-500');
+                }
+            }, 1000);
+        }
+
+        // O botão "Cancelar" foge do mouse!
+        function fugirBotao() {
+            const btn = document.getElementById('btn-foge');
+            const randomX = (Math.random() - 0.5) * 200;
+            const randomY = (Math.random() - 0.5) * 100;
+            btn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+        }
+
+        function caiuNaZueira() {
+            clearInterval(timerInterval);
+            if (streamGlobal) {
+                streamGlobal.getTracks().forEach(track => track.stop());
+            }
+            alert("🤡 PEGADINHA! Você acabou de cair na melhor pegadinha institucional do ano. Seu amigo passou no teste de sobrevivência digital!");
+            document.getElementById('modal-biometria').classList.add('hidden');
+            document.getElementById('modal-biometria').classList.remove('flex');
+            document.getElementById('modal-terror').classList.add('hidden');
+            document.getElementById('modal-terror').classList.remove('flex');
+            document.getElementById('btn-foge').style.transform = 'translate(0px, 0px)';
+            document.getElementById('timer').classList.remove('text-red-500');
+        }
+    </script>
+</body>
+</html>
